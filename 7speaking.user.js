@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      1.0
+// @version      1.1
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -15,15 +15,8 @@
     return regex.test(location.pathname);
   }
 
-  function error(message, cb = null) {
-    if (cb) {
-      if (confirm(message)) {
-        cb();
-      }
-    } else {
-      alert(message);
-    }
-
+  function error(message) {
+    alert(message);
     throw new Error(message);
   }
 
@@ -170,9 +163,9 @@
       const quizButton = document.querySelector('.category-action-bottom button');
 
       if (!quizButton) {
-        return error("Can't find quiz button", () => {
-          location.href = '/home';
-        });
+        console.log("Can't find quiz button, returning to /home");
+        location.href = '/home';
+        throw new Error();
       }
 
       quizButton.click();
