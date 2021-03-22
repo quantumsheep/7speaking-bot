@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      2.0
+// @version      3.0
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -169,7 +169,11 @@
     } else {
       const inputs = document.querySelectorAll('.question_variant .radioButtons.choice_variant label');
 
-      inputs[+answer - 1].click();
+      if (isNaN(answer)) {
+        inputs[+answer - 1].click();
+      } else {
+        inputs(answer.charCodeAt(0) - 'A'.charCodeAt(0)).click();
+      }
 
       const submitButton = await waitForQuerySelector('.buttons_container button:last-child');
 
