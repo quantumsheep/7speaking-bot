@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      6.0
+// @version      6.1
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -282,7 +282,7 @@
     } else if (isPath(/^\/workshop/)) {
       console.log(`Current route is /workshop`);
 
-      await waitForQuerySelector('.category-action-content');
+      await waitForQuerySelector('.banner');
 
       const buttons = document.querySelectorAll('.bottom-pagination .pagination button');
 
