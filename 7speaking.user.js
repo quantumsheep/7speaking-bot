@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      3.1
+// @version      4.0
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -167,10 +167,14 @@
         await wait(1000);
       }
     } else {
-      const inputs = document.querySelectorAll('.question_variant .radioButtons.choice_variant label');
+      const inputs = document.querySelectorAll('.question_variant label');
 
       if (isNaN(answer)) {
-        inputs[answer.charCodeAt(0) - 'A'.charCodeAt(0)].click();
+        const options = answer.split(',');
+
+        for (const option of options) {
+          inputs[option.charCodeAt(0) - 'A'.charCodeAt(0)].click();
+        }
       } else {
         inputs[+answer - 1].click();
       }
