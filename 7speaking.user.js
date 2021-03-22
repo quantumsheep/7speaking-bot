@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      1.2
+// @version      2.0
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -35,17 +35,17 @@
     });
   }
 
-  async function completeQuiz() {
-    function getReactElement(e) {
-      for (const key in e) {
-        if (key.startsWith('__reactInternalInstance$')) {
-          return e[key];
-        }
+  function getReactElement(e) {
+    for (const key in e) {
+      if (key.startsWith('__reactInternalInstance$')) {
+        return e[key];
       }
-
-      return null;
     }
 
+    return null;
+  }
+
+  async function completeQuiz() {
     async function findAnswer() {
       const e = await waitForQuerySelector('.question-container');
       let container = getReactElement(e);
@@ -94,7 +94,7 @@
 
     const answer = await findAnswer();
 
-    if (!answer) {
+    if (answer === null || answer === undefined) {
       return error("Can't find answer");
     }
 
@@ -139,6 +139,50 @@
     await wait(500);
   }
 
+  async function completeExam() {
+    async function findAnswer() {
+      const e = await waitForQuerySelector('.question_content');
+      let container = getReactElement(e);
+
+      while (container) {
+        if (container.memoizedProps && container.memoizedProps.questions) {
+          return container.memoizedProps.questions[0].answer;
+        }
+
+        container = container.return;
+      }
+
+      return null;
+    }
+
+    const answer = await findAnswer();
+
+    if (answer === null || answer === undefined) {
+      const submitButton = document.querySelector('.buttons_container button:last-child');
+
+      if (!submitButton) {
+        return error("Can't find answer");
+      } else {
+        submitButton.click();
+        await wait(1000);
+      }
+    } else {
+      const inputs = document.querySelectorAll('.question_variant .radioButtons.choice_variant label');
+
+      inputs[+answer - 1].click();
+
+      const submitButton = await waitForQuerySelector('.buttons_container button:last-child');
+
+      submitButton.click();
+
+      await wait(1000);
+
+      submitButton.click();
+
+      await wait(1000);
+    }
+  }
+
   async function routes() {
     console.log(`Analysing current route`);
 
@@ -151,6 +195,28 @@
       e.click();
 
       routes();
+    } else if (isPath(/^\/workshop\/exams-tests/)) {
+      const search = new URLSearchParams(location.search);
+
+      if (search.has('id')) {
+        await completeExam();
+        routes();
+      } else {
+        const nextExam = await waitForQuerySelector('.lists .list__items.active');
+        nextExam.click();
+
+        await wait(300);
+
+        const modalConfirmButton = document.querySelector('.confirmCloseDialog__buttons button:last-child');
+
+        if (modalConfirmButton) {
+          modalConfirmButton.click();
+        }
+
+        await wait(1000);
+
+        routes();
+      }
     } else if (isPath(/^\/workshop/)) {
       console.log(`Current route is /workshop`);
 
@@ -182,6 +248,8 @@
       routes();
     } else if (isPath(/^\/quiz/)) {
       console.log(`Current route is /quiz`);
+
+      await waitForQuerySelector('.quiz__container');
 
       if (document.querySelector('.result-container')) {
         location.href = '/home';
