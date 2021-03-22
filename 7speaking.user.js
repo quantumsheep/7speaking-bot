@@ -170,9 +170,9 @@
       const inputs = document.querySelectorAll('.question_variant .radioButtons.choice_variant label');
 
       if (isNaN(answer)) {
-        inputs[+answer - 1].click();
-      } else {
         inputs[answer.charCodeAt(0) - 'A'.charCodeAt(0)].click();
+      } else {
+        inputs[+answer - 1].click();
       }
 
       const submitButton = await waitForQuerySelector('.buttons_container button:last-child');
