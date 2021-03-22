@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      4.0
+// @version      5.0
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -167,26 +167,44 @@
         await wait(1000);
       }
     } else {
-      const inputs = document.querySelectorAll('.question_variant label');
+      if (typeof answer === 'object') {
+        const columns = document.querySelectorAll('.question_variant tbody tr td');
 
-      if (isNaN(answer)) {
-        const options = answer.split(',');
+        for (const i in answer) {
+          const inputs = columns[+i - 1].querySelectorAll('input');
 
-        for (const option of options) {
-          inputs[option.charCodeAt(0) - 'A'.charCodeAt(0)].click();
+          for (const j in answer[i]) {
+            const input = getReactElement(inputs[j]);
+
+            input.memoizedProps.onChange({
+              target: {
+                value: answer[i][j],
+              },
+            });
+          }
         }
+
+        await wait(500);
       } else {
-        inputs[+answer - 1].click();
+        const inputs = document.querySelectorAll('.question_variant label');
+
+        if (isNaN(answer)) {
+          const options = answer.split(',');
+
+          for (const option of options) {
+            inputs[option.charCodeAt(0) - 'A'.charCodeAt(0)].click();
+          }
+        } else {
+          inputs[+answer - 1].click();
+        }
       }
 
       const submitButton = await waitForQuerySelector('.buttons_container button:last-child');
 
       submitButton.click();
-
       await wait(1000);
 
       submitButton.click();
-
       await wait(1000);
     }
   }
