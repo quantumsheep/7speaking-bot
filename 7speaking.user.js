@@ -146,7 +146,19 @@
 
       while (container) {
         if (container.memoizedProps && container.memoizedProps.questions) {
-          return container.memoizedProps.questions[0].answer;
+          const [question] = container.memoizedProps.questions;
+
+          if (question.needorder) {
+            const options = {};
+
+            for (const k in question.answer) {
+              options[k] = question.answer[k].sort((a, b) => a - b);
+            }
+
+            return options;
+          }
+
+          return question.answer;
         }
 
         container = container.return;
@@ -168,23 +180,47 @@
       }
     } else {
       if (typeof answer === 'object') {
-        const columns = document.querySelectorAll('.question_variant tbody tr td');
+        const optionsAreTypeof = (type) => Object.values(answer).every(options => options.every(option => typeof option === type))
 
-        for (const i in answer) {
-          const inputs = columns[+i - 1].querySelectorAll('input');
+        if (optionsAreTypeof('boolean')) {
+          console.log(`Options are booleans`);
 
-          for (const j in answer[i]) {
-            const input = getReactElement(inputs[j]);
+          const lines = [...document.querySelectorAll('.question_variant tbody tr')];
 
-            input.memoizedProps.onChange({
-              target: {
-                value: answer[i][j],
-              },
-            });
+          for (const i in lines) {
+            const inputs = lines[i].querySelectorAll('td input');
+
+            for (const j in answer) {
+              const input = inputs[+j - 1];
+
+              if (answer[j][i]) {
+                input.click();
+              }
+            }
           }
+        } else if (optionsAreTypeof('string') || optionsAreTypeof('number')) {
+          console.log(`Options are strings/numbers`);
+
+          const columns = [...document.querySelectorAll('.question_variant tbody tr td')];
+
+          for (const i in answer) {
+            const inputs = columns[+i - 1].querySelectorAll('input');
+
+            for (const j in answer[i]) {
+              const input = getReactElement(inputs[j]);
+
+              input.memoizedProps.onChange({
+                target: {
+                  value: answer[i][j].toString(),
+                },
+              });
+            }
+          }
+        } else {
+          return error(`Can't understand this type of options`);
         }
 
-        await wait(500);
+        await wait(1000);
       } else {
         const inputs = document.querySelectorAll('.question_variant label');
 
