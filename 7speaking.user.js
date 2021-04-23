@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         7Speaking Bot
 // @namespace    https://github.com/quantumsheep
-// @version      6.1
+// @version      7.0
 // @description  7Speaking is kil
 // @author       quantumsheep
 // @match        https://user.7speaking.com/*
@@ -290,7 +290,11 @@
         buttons[buttons.length - 1].click();
       }
 
-      const quizButton = document.querySelector('.category-action-bottom button');
+      let quizButton = document.querySelector('.category-action-bottom button');
+
+      if (!quizButton) {
+        quizButton = document.querySelector('button.cardMode__goToQuiz');
+      }
 
       if (!quizButton) {
         console.log("Can't find quiz button, returning to /home");
