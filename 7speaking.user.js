@@ -51,8 +51,8 @@
       let container = getReactElement(e);
 
       while (container) {
-        if (container.memoizedProps && container.memoizedProps.answerOptions && container.memoizedProps.answerOptions.answer) {
-          return container.memoizedProps.answerOptions.answer[0];
+        if (container.memoizedProps) {
+          return container.memoizedProps.children[5].props.children[0].props.children.props.answerOptions.answer[0].value;
         }
 
         container = container.return;
@@ -74,7 +74,7 @@
       const buttons = document.querySelectorAll('.answer-container button');
 
       for (const button of buttons) {
-        if (button.querySelector('.question__customLabel').innerText === answer) {
+        if (button.querySelector('.question__customLabel').innerText.trim() === answer.trim()) {
           return {
             element: button,
             type: 'button'
@@ -293,7 +293,7 @@
       let quizButton = document.querySelector('.category-action-bottom button');
 
       if (!quizButton) {
-        quizButton = document.querySelector('button.cardMode__goToQuiz');
+        quizButton = document.querySelector('button.cardMode__goToQuiz:not(.finalCard__btns button)');
       }
 
       if (!quizButton) {
